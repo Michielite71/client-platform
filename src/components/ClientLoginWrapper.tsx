@@ -1,7 +1,7 @@
 'use client'
 
 import { Suspense } from 'react'
-import ClientLogin from './ClientLogin'
+import ClientLogin from '@/components/ClientLogin'
 
 function LoadingFallback() {
   return (
