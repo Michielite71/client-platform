@@ -1,8 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { getRedirectUrl } from '@/lib/config'
 
 export default function ClientLogin() {
   const [email, setEmail] = useState('')
@@ -14,15 +15,7 @@ export default function ClientLogin() {
   const searchParams = useSearchParams()
   const supabase = createClient()
 
-  // Check for token login on component mount
-  useEffect(() => {
-    const token = searchParams.get('token')
-    if (token) {
-      handleTokenLogin(token)
-    }
-  }, [searchParams])
-
-  const handleTokenLogin = async (token: string) => {
+  const handleTokenLogin = useCallback(async (token: string) => {
     setTokenLoading(true)
     try {
       // Verify token and get client info
@@ -53,7 +46,7 @@ export default function ClientLogin() {
       const { error: signInError } = await supabase.auth.signInWithOtp({
         email: tokenData.clients.email,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: getRedirectUrl('/dashboard'),
           shouldCreateUser: false
         }
       })
@@ -73,7 +66,16 @@ export default function ClientLogin() {
     } finally {
       setTokenLoading(false)
     }
-  }
+  }, [supabase, router])
+
+  // Check for token login on component mount
+  useEffect(() => {
+    document.title = "Client Login - WealthWise Portal"
+    const token = searchParams.get('token')
+    if (token) {
+      handleTokenLogin(token)
+    }
+  }, [searchParams, handleTokenLogin])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -97,7 +99,7 @@ export default function ClientLogin() {
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/dashboard`,
+        emailRedirectTo: getRedirectUrl('/dashboard'),
       }
     })
 
@@ -217,7 +219,7 @@ export default function ClientLogin() {
               </div>
               <h3 className="text-xl font-bold text-white">Login link sent!</h3>
               <p className="text-gray-400 mb-4">
-                We've sent a secure login link to <span className="text-emerald-400 font-medium">{email}</span>
+                We&apos;ve sent a secure login link to <span className="text-emerald-400 font-medium">{email}</span>
               </p>
               <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6">
                 <p className="text-blue-300 text-sm">

@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import ClientDashboard from '@/components/ClientDashboard'
 
 export default async function DashboardPage() {
@@ -9,7 +8,7 @@ export default async function DashboardPage() {
 
   // If user is authenticated, check clients table
   if (user) {
-    const { data: client, error } = await supabase
+    const { data: client } = await supabase
       .from('clients')
       .select('*')
       .eq('email', user.email)

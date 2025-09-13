@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -30,7 +30,26 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
   const router = useRouter()
   const supabase = createClient()
 
+  const fetchBalances = useCallback(async () => {
+    if (!client) return
+
+    const { data, error } = await supabase
+      .from('client_balances')
+      .select('*')
+      .eq('client_id', client.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching balances:', error)
+    } else {
+      setBalances(data || [])
+    }
+    setLoading(false)
+  }, [supabase, client])
+
   useEffect(() => {
+    document.title = client ? `${client.full_name} - WealthWise Dashboard` : "WealthWise Client Dashboard"
+
     // If no client from server, try to get from sessionStorage
     if (!client && typeof window !== 'undefined') {
       const storedClient = sessionStorage.getItem('clientData')
@@ -45,22 +64,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
     if (client) {
       fetchBalances()
     }
-  }, [client])
-
-  async function fetchBalances() {
-    const { data, error } = await supabase
-      .from('client_balances')
-      .select('*')
-      .eq('client_id', client.id)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Error fetching balances:', error)
-    } else {
-      setBalances(data || [])
-    }
-    setLoading(false)
-  }
+  }, [client, fetchBalances, router])
 
   async function signOut() {
     await supabase.auth.signOut()
