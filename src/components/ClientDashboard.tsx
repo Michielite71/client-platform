@@ -263,51 +263,74 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8 px-6">
                 <button
-                  onClick={() => {
-                    console.log('Overview tab clicked')
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('Overview tab clicked - event:', e)
                     setActiveTab('overview')
+                    alert('Overview clicked!')
                   }}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`relative z-10 cursor-pointer py-4 px-4 border-b-2 font-medium text-sm transition-all duration-200 ${
                     activeTab === 'overview'
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-indigo-500 text-indigo-600 bg-indigo-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                   }`}
+                  style={{ pointerEvents: 'auto' }}
                 >
-                  Overview
+                  📊 Overview
                 </button>
                 <button
-                  onClick={() => {
-                    console.log('Campaigns tab clicked')
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('Campaigns tab clicked - event:', e)
                     setActiveTab('campaigns')
+                    alert('Campaigns clicked!')
                   }}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`relative z-10 cursor-pointer py-4 px-4 border-b-2 font-medium text-sm transition-all duration-200 ${
                     activeTab === 'campaigns'
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-indigo-500 text-indigo-600 bg-indigo-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                   }`}
+                  style={{ pointerEvents: 'auto' }}
                 >
-                  Campaigns
+                  🎯 Campaigns
                 </button>
                 <button
-                  onClick={() => {
-                    console.log('Transactions tab clicked')
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('Transactions tab clicked - event:', e)
                     setActiveTab('transactions')
+                    alert('Transactions clicked!')
                   }}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`relative z-10 cursor-pointer py-4 px-4 border-b-2 font-medium text-sm transition-all duration-200 ${
                     activeTab === 'transactions'
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                      ? 'border-indigo-500 text-indigo-600 bg-indigo-50'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                   }`}
+                  style={{ pointerEvents: 'auto' }}
                 >
-                  Transactions
+                  💰 Transactions
                 </button>
               </nav>
             </div>
           </div>
 
           {/* Debug Info */}
-          <div className="bg-gray-100 p-2 mb-4 rounded text-sm text-gray-600">
-            Current Active Tab: {activeTab}
+          <div className="bg-red-100 border border-red-300 p-3 mb-4 rounded text-sm text-red-800">
+            <strong>DEBUG:</strong> Current Active Tab: {activeTab}
+            <br />
+            <button 
+              onClick={() => {
+                console.log('Debug button clicked! Active tab is:', activeTab)
+                alert('Debug button works! Current tab: ' + activeTab)
+                setActiveTab('campaigns')
+              }}
+              className="bg-red-500 text-white px-2 py-1 rounded mt-2 text-xs"
+            >
+              Test Click (Should switch to campaigns)
+            </button>
           </div>
 
           {/* Tab Content */}
