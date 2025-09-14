@@ -102,8 +102,9 @@ export default function CreateCampaignModal({ client, onClose, onCampaignAdded }
 
       onCampaignAdded()
       onClose()
-    } catch (err: any) {
-      setError(err?.message || String(err))
+    } catch (err: unknown) {
+      if (err instanceof Error) setError(err.message)
+      else setError(String(err))
     } finally {
       setLoading(false)
     }
