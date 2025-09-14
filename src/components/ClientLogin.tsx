@@ -7,9 +7,9 @@ import { getRedirectUrl } from '@/lib/config'
 
 export default function ClientLogin() {
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
-  const [sent, setSent] = useState(false)
   const [tokenLoading, setTokenLoading] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
@@ -57,8 +57,9 @@ export default function ClientLogin() {
         sessionStorage.setItem('clientData', JSON.stringify(tokenData.clients))
         router.push('/dashboard')
       } else {
-        setMessage('Check your email for the login confirmation link.')
-        setSent(true)
+        // OTP sent, redirect to dashboard after a short delay
+        setMessage('Access link processed successfully.')
+        setTimeout(() => router.push('/dashboard'), 1000)
       }
     } catch (error) {
       console.error('Token login error:', error)
@@ -95,19 +96,17 @@ export default function ClientLogin() {
       return
     }
 
-    // Send magic link for passwordless authentication
-    const { error } = await supabase.auth.signInWithOtp({
+    // Authenticate with email and password
+    const { error } = await supabase.auth.signInWithPassword({
       email,
-      options: {
-        emailRedirectTo: getRedirectUrl('/dashboard'),
-      }
+      password
     })
 
     if (error) {
-      setMessage(error.message)
+      setMessage('Invalid credentials. Please check your email and password.')
     } else {
-      setSent(true)
-      setMessage('Check your email for the login link!')
+      // Successful login, redirect to dashboard
+      router.push('/dashboard')
     }
 
     setLoading(false)
@@ -157,83 +156,75 @@ export default function ClientLogin() {
             WealthWise Client Portal
           </h2>
           <p className="mt-2 text-gray-400">
-            Enter your email to access your account
+            Enter your credentials to access your account
           </p>
         </div>
 
         <div className="bg-gray-800/50 backdrop-blur-xl rounded-2xl p-8 shadow-2xl border border-gray-700/50">
-          {!sent ? (
-            <form className="space-y-6" onSubmit={handleLogin}>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                  Email address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:border-gray-500"
-                  placeholder="Enter your email address"
-                />
-              </div>
+          <form className="space-y-6" onSubmit={handleLogin}>
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                Email address
+              </label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:border-gray-500"
+                placeholder="Enter your email address"
+              />
+            </div>
 
-              {message && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
-                  <div className="text-red-400 text-sm text-center">{message}</div>
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-2">
+                Password
+              </label>
+              <input
+                id="password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-900/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all duration-200 hover:border-gray-500"
+                placeholder="Enter your password"
+              />
+            </div>
+
+            {message && (
+              <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+                <div className="text-red-400 text-sm text-center">{message}</div>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-xl"
+            >
+              {loading ? (
+                <div className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Signing in...
+                </div>
+              ) : (
+                <div className="flex items-center justify-center space-x-2">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Sign In</span>
                 </div>
               )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-xl"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Sending link...
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-center space-x-2">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    <span>Send login link</span>
-                  </div>
-                )}
-              </button>
-            </form>
-          ) : (
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-green-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold text-white">Login link sent!</h3>
-              <p className="text-gray-400 mb-4">
-                We&apos;ve sent a secure login link to <span className="text-emerald-400 font-medium">{email}</span>
-              </p>
-              <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 mb-6">
-                <p className="text-blue-300 text-sm">
-                  Check your email and click the link to access your dashboard.
-                </p>
-              </div>
-              <button
-                onClick={() => setSent(false)}
-                className="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition-colors"
-              >
-                Send another link
-              </button>
-            </div>
-          )}
+            </button>
+          </form>
         </div>
       </div>
     </div>
