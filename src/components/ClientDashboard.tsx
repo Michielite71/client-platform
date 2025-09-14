@@ -263,7 +263,10 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
             <div className="border-b border-gray-200">
               <nav className="-mb-px flex space-x-8 px-6">
                 <button
-                  onClick={() => setActiveTab('overview')}
+                  onClick={() => {
+                    console.log('Overview tab clicked')
+                    setActiveTab('overview')
+                  }}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'overview'
                       ? 'border-indigo-500 text-indigo-600'
@@ -273,7 +276,10 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                   Overview
                 </button>
                 <button
-                  onClick={() => setActiveTab('campaigns')}
+                  onClick={() => {
+                    console.log('Campaigns tab clicked')
+                    setActiveTab('campaigns')
+                  }}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'campaigns'
                       ? 'border-indigo-500 text-indigo-600'
@@ -283,7 +289,10 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                   Campaigns
                 </button>
                 <button
-                  onClick={() => setActiveTab('transactions')}
+                  onClick={() => {
+                    console.log('Transactions tab clicked')
+                    setActiveTab('transactions')
+                  }}
                   className={`py-4 px-1 border-b-2 font-medium text-sm ${
                     activeTab === 'transactions'
                       ? 'border-indigo-500 text-indigo-600'
@@ -294,6 +303,11 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                 </button>
               </nav>
             </div>
+          </div>
+
+          {/* Debug Info */}
+          <div className="bg-gray-100 p-2 mb-4 rounded text-sm text-gray-600">
+            Current Active Tab: {activeTab}
           </div>
 
           {/* Tab Content */}
