@@ -169,85 +169,90 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-semibold text-gray-900">
-                WealthWise Client Portal
+          <div className="flex justify-between items-center h-12 sm:h-16">
+            <div className="flex items-center min-w-0 flex-1">
+              <h1 className="text-base sm:text-xl font-semibold text-gray-900 truncate">
+                <span className="hidden sm:inline">WealthWise Client Portal</span>
+                <span className="sm:hidden">WealthWise</span>
               </h1>
             </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
+            <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+              <span className="text-xs sm:text-sm text-gray-700 hidden md:inline truncate max-w-[120px] lg:max-w-none">
                 Welcome, {client.full_name}
+              </span>
+              <span className="text-xs text-gray-700 md:hidden">
+                {client.full_name.split(' ')[0]}
               </span>
               <button
                 onClick={signOut}
-                className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-md text-sm font-medium"
+                className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 sm:px-3 sm:py-2 rounded-md text-xs sm:text-sm font-medium"
               >
-                Sign out
+                <span className="hidden sm:inline">Sign out</span>
+                <span className="sm:hidden">Exit</span>
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+      <main className="max-w-7xl mx-auto py-3 sm:py-4 lg:py-6 px-4 sm:px-6 lg:px-8">
+        <div className="space-y-4 sm:space-y-6">
           {/* Client Info Card */}
-          <div className="bg-white shadow rounded-lg p-6 mb-6">
-            <h2 className="text-lg font-medium text-gray-900 mb-4">Account Information</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-white shadow rounded-lg p-4 sm:p-6">
+            <h2 className="text-base sm:text-lg font-medium text-gray-900 mb-3 sm:mb-4">Account Information</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-500">Full Name</p>
-                <p className="mt-1 text-sm text-gray-900">{client.full_name}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Full Name</p>
+                <p className="mt-1 text-sm sm:text-base text-gray-900 break-words">{client.full_name}</p>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500">Email</p>
-                <p className="mt-1 text-sm text-gray-900">{client.email}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Email</p>
+                <p className="mt-1 text-sm sm:text-base text-gray-900 break-all">{client.email}</p>
               </div>
               {client.phone && (
                 <div>
-                  <p className="text-sm font-medium text-gray-500">Phone</p>
-                  <p className="mt-1 text-sm text-gray-900">{client.phone}</p>
+                  <p className="text-xs sm:text-sm font-medium text-gray-500">Phone</p>
+                  <p className="mt-1 text-sm sm:text-base text-gray-900">{client.phone}</p>
                 </div>
               )}
               <div>
-                <p className="text-sm font-medium text-gray-500">Client Since</p>
-                <p className="mt-1 text-sm text-gray-900">{formatDate(client.created_at)}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-500">Client Since</p>
+                <p className="mt-1 text-sm sm:text-base text-gray-900">{formatDate(client.created_at)}</p>
               </div>
             </div>
           </div>
 
           {/* Balance Summary */}
           {/* Dashboard Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div className="bg-gradient-to-r from-green-500 to-emerald-600 shadow rounded-lg p-6">
-              <h2 className="text-lg font-medium text-white mb-2">Current Balance</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            <div className="bg-gradient-to-r from-green-500 to-emerald-600 shadow rounded-lg p-4 sm:p-6">
+              <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Current Balance</h2>
               {loading ? (
-                <div className="text-white text-2xl">Loading...</div>
+                <div className="text-white text-lg sm:text-2xl">Loading...</div>
               ) : (
-                <div className="text-3xl font-bold text-white">
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white break-words">
                   {formatCurrency(currentBalance)}
                 </div>
               )}
             </div>
 
-            <div className="bg-gradient-to-r from-blue-500 to-cyan-600 shadow rounded-lg p-6">
-              <h2 className="text-lg font-medium text-white mb-2">Active Campaigns</h2>
+            <div className="bg-gradient-to-r from-blue-500 to-cyan-600 shadow rounded-lg p-4 sm:p-6">
+              <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Active Campaigns</h2>
               {loading ? (
-                <div className="text-white text-2xl">Loading...</div>
+                <div className="text-white text-lg sm:text-2xl">Loading...</div>
               ) : (
-                <div className="text-3xl font-bold text-white">
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
                   {campaigns.filter(c => c.status === 'active').length}
                 </div>
               )}
             </div>
 
-            <div className="bg-gradient-to-r from-purple-500 to-pink-600 shadow rounded-lg p-6">
-              <h2 className="text-lg font-medium text-white mb-2">Total ROI Earned</h2>
+            <div className="bg-gradient-to-r from-purple-500 to-pink-600 shadow rounded-lg p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
+              <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Total ROI Earned</h2>
               {loading ? (
-                <div className="text-white text-2xl">Loading...</div>
+                <div className="text-white text-lg sm:text-2xl">Loading...</div>
               ) : (
-                <div className="text-3xl font-bold text-white">
+                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white break-words">
                   {formatCurrency(campaigns.reduce((sum, c) => sum + c.total_roi_earned, 0))}
                 </div>
               )}
@@ -255,9 +260,9 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
           </div>
 
           {/* Tab Navigation */}
-          <div className="bg-white shadow rounded-lg mb-6">
+          <div className="bg-white shadow rounded-lg">
             <div className="border-b border-gray-200">
-              <nav className="-mb-px flex space-x-8 px-6">
+              <nav className="-mb-px flex space-x-4 sm:space-x-8 px-3 sm:px-6 overflow-x-auto">
                 <button
                   onClick={(e) => {
                     e.preventDefault()
@@ -266,7 +271,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                     setActiveTab('overview')
                     alert('Overview clicked!')
                   }}
-                  className={`relative z-10 cursor-pointer py-4 px-4 border-b-2 font-medium text-sm transition-all duration-200 ${
+                  className={`relative z-10 cursor-pointer py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm transition-all duration-200 whitespace-nowrap ${
                     activeTab === 'overview'
                       ? 'border-indigo-500 text-indigo-600 bg-indigo-50'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
@@ -283,7 +288,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                     setActiveTab('campaigns')
                     alert('Campaigns clicked!')
                   }}
-                  className={`relative z-10 cursor-pointer py-4 px-4 border-b-2 font-medium text-sm transition-all duration-200 ${
+                  className={`relative z-10 cursor-pointer py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm transition-all duration-200 whitespace-nowrap ${
                     activeTab === 'campaigns'
                       ? 'border-indigo-500 text-indigo-600 bg-indigo-50'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'
@@ -300,7 +305,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                     setActiveTab('transactions')
                     alert('Transactions clicked!')
                   }}
-                  className={`relative z-10 cursor-pointer py-4 px-4 border-b-2 font-medium text-sm transition-all duration-200 ${
+                  className={`relative z-10 cursor-pointer py-3 sm:py-4 px-2 sm:px-4 border-b-2 font-medium text-xs sm:text-sm transition-all duration-200 whitespace-nowrap ${
                     activeTab === 'transactions'
                       ? 'border-indigo-500 text-indigo-600 bg-indigo-50'
                       : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 hover:bg-gray-50'

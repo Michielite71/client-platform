@@ -6,7 +6,7 @@ export function getClientPortalBaseUrl(): string {
 
   // In production, use the specific domain as fallback
   if (process.env.NODE_ENV === 'production') {
-    return 'https://retcol.plataform.wealthwisemarketing.pro'
+    return 'https://retcol.platform.wealthwisemarketing.pro'
   }
 
   // In development, check if we're in browser environment
