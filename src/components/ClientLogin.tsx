@@ -156,7 +156,7 @@ export default function ClientLogin() {
             WealthWise Client Portal
           </h2>
           <p className="mt-2 text-gray-400">
-            Enter your credentials to access your account
+            Enter your email and password to access your account
           </p>
         </div>
 
