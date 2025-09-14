@@ -532,12 +532,12 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
           }}
         />
       )}
+      {showLeadsFor && (
+        <LeadsModal
+          campaign={showLeadsFor}
+          onClose={() => setShowLeadsFor(null)}
+        />
+      )}
     </div>
-    {showLeadsFor && (
-      <LeadsModal
-        campaign={showLeadsFor}
-        onClose={() => setShowLeadsFor(null)}
-      />
-    )}
   )
 }
