@@ -74,27 +74,6 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
     setLoading(false)
   }, [supabase, client])
 
-  useEffect(() => {
-    document.title = client ? `${client.full_name} - WealthWise Dashboard` : "WealthWise Client Dashboard"
-
-    // If no client from server, try to get from sessionStorage
-    if (!client && typeof window !== 'undefined') {
-      const storedClient = sessionStorage.getItem('clientData')
-      if (storedClient) {
-        setClient(JSON.parse(storedClient))
-      } else {
-        router.push('/login')
-        return
-      }
-    }
-
-    if (client) {
-      fetchBalances()
-      fetchTransactions()
-      fetchCampaigns()
-    }
-  }, [client, fetchBalances, fetchTransactions, fetchCampaigns, router])
-
   const fetchTransactions = useCallback(async () => {
     if (!client) return
 
@@ -130,6 +109,27 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
     }
   }, [client, supabase])
 
+  useEffect(() => {
+    document.title = client ? `${client.full_name} - WealthWise Dashboard` : "WealthWise Client Dashboard"
+
+    // If no client from server, try to get from sessionStorage
+    if (!client && typeof window !== 'undefined') {
+      const storedClient = sessionStorage.getItem('clientData')
+      if (storedClient) {
+        setClient(JSON.parse(storedClient))
+      } else {
+        router.push('/login')
+        return
+      }
+    }
+
+    if (client) {
+      fetchBalances()
+      fetchTransactions()
+      fetchCampaigns()
+    }
+  }, [client, fetchBalances, fetchTransactions, fetchCampaigns, router])
+
   async function signOut() {
     await supabase.auth.signOut()
     // Clear session storage
@@ -137,10 +137,6 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
       sessionStorage.removeItem('clientData')
     }
     router.push('/login')
-  }
-
-  const getTotalBalance = () => {
-    return balances.reduce((total, balance) => total + balance.balance, 0)
   }
 
   const formatCurrency = (amount: number) => {
