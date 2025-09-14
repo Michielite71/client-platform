@@ -3,9 +3,12 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import LeadsModal from '@/components/LeadsModal'
+import CreateCampaignModal from '@/components/CreateCampaignModal'
 
 interface Client {
   id: string
+  uid?: string
   email: string
   full_name: string
   phone?: string
@@ -53,9 +56,20 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [currentBalance, setCurrentBalance] = useState(0)
   const [activeTab, setActiveTab] = useState<'overview' | 'campaigns' | 'transactions'>('overview')
+  const [showLeadsFor, setShowLeadsFor] = useState<Campaign | null>(null)
+  const [showCreateCampaign, setShowCreateCampaign] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text)
+      alert('UID copied to clipboard')
+    } catch (e) {
+      console.error('Copy failed', e)
+    }
+  }
 
   const fetchBalances = useCallback(async () => {
     if (!client) return
@@ -209,16 +223,25 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                 <p className="text-xs sm:text-sm font-medium text-gray-400">Email</p>
                 <p className="mt-1 text-sm sm:text-base text-white break-all">{client.email}</p>
               </div>
+              <div className="sm:col-span-2">
+                <p className="text-xs sm:text-sm font-medium text-gray-400">UID</p>
+                <div className="mt-1 flex items-center space-x-2">
+                  <code className="text-xs sm:text-sm text-gray-300 break-all">{client.uid || client.id}</code>
+                  <button
+                    onClick={() => copyToClipboard(client.uid || client.id)}
+                    className="text-xs text-blue-400 hover:text-blue-300"
+                    title="Copy UID"
+                  >
+                    Copy
+                  </button>
+                </div>
+              </div>
               {client.phone && (
                 <div>
                   <p className="text-xs sm:text-sm font-medium text-gray-400">Phone</p>
                   <p className="mt-1 text-sm sm:text-base text-white">{client.phone}</p>
                 </div>
               )}
-              <div>
-                <p className="text-xs sm:text-sm font-medium text-gray-400">Client Since</p>
-                <p className="mt-1 text-sm sm:text-base text-white">{formatDate(client.created_at)}</p>
-              </div>
             </div>
           </div>
 
@@ -342,13 +365,37 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                     </div>
                   )}
                 </div>
+
+                {/* Leads KPIs (hardcoded until API integration) */}
+                <div className="px-6 py-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div className="bg-gradient-to-r from-emerald-500/20 to-teal-600/20 rounded-2xl p-6 border border-emerald-500/30">
+                      <p className="text-emerald-300 text-sm">Total Leads</p>
+                      <p className="text-2xl font-bold text-white mt-1">124</p>
+                    </div>
+                    <div className="bg-gradient-to-r from-blue-500/20 to-cyan-600/20 rounded-2xl p-6 border border-blue-500/30">
+                      <p className="text-blue-300 text-sm">Leads Today</p>
+                      <p className="text-2xl font-bold text-white mt-1">8</p>
+                    </div>
+                    <div className="bg-gradient-to-r from-purple-500/20 to-pink-600/20 rounded-2xl p-6 border border-purple-500/30">
+                      <p className="text-purple-300 text-sm">Avg CPL</p>
+                      <p className="text-2xl font-bold text-white mt-1">$14.50</p>
+                    </div>
+                  </div>
+                </div>
               </>
             )}
 
             {activeTab === 'campaigns' && (
               <>
-                <div className="px-6 py-4 border-b border-gray-700/50">
+                <div className="px-6 py-4 border-b border-gray-700/50 flex items-center justify-between">
                   <h2 className="text-lg font-medium text-white">My Campaigns</h2>
+                  <button
+                    onClick={() => setShowCreateCampaign(true)}
+                    className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
+                  >
+                    Create Campaign
+                  </button>
                 </div>
                 <div className="px-6 py-4">
                   {loading ? (
@@ -407,6 +454,15 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                               </div>
                             )}
                           </div>
+
+                          <div className="mt-4 flex items-center justify-end">
+                            <button
+                              onClick={() => setShowLeadsFor(campaign)}
+                              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-xl text-sm font-medium"
+                            >
+                              View Leads
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -463,6 +519,25 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
           </div>
         </div>
       </main>
+      {showCreateCampaign && client && (
+        // lazy import not necessary here
+        <CreateCampaignModal
+          client={client}
+          onClose={() => setShowCreateCampaign(false)}
+          onCampaignAdded={() => {
+            setShowCreateCampaign(false)
+            // refresh lists
+            fetchCampaigns()
+            fetchTransactions()
+          }}
+        />
+      )}
     </div>
+    {showLeadsFor && (
+      <LeadsModal
+        campaign={showLeadsFor}
+        onClose={() => setShowLeadsFor(null)}
+      />
+    )}
   )
 }
