@@ -219,35 +219,50 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
 
           {/* Balance Summary */}
           {/* Dashboard Metrics */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-            <div className="bg-gradient-to-r from-blue-500 to-blue-600 shadow rounded-lg p-4 sm:p-6">
-              <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Current Balance</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <div className="bg-gradient-to-br from-emerald-500 to-green-600 shadow-xl rounded-2xl p-6 transform hover:scale-105 transition-all duration-300">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm sm:text-base font-semibold text-white/90">Current Balance</h2>
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-xl">💰</span>
+                </div>
+              </div>
               {loading ? (
-                <div className="text-white text-lg sm:text-2xl">Loading...</div>
+                <div className="text-white text-lg sm:text-2xl animate-pulse">Loading...</div>
               ) : (
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white break-words">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
                   {formatCurrency(currentBalance)}
                 </div>
               )}
             </div>
 
-            <div className="bg-gradient-to-r from-blue-600 to-blue-700 shadow rounded-lg p-4 sm:p-6">
-              <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Active Campaigns</h2>
+            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 shadow-xl rounded-2xl p-6 transform hover:scale-105 transition-all duration-300">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm sm:text-base font-semibold text-white/90">Active Campaigns</h2>
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-xl">🎯</span>
+                </div>
+              </div>
               {loading ? (
-                <div className="text-white text-lg sm:text-2xl">Loading...</div>
+                <div className="text-white text-lg sm:text-2xl animate-pulse">Loading...</div>
               ) : (
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
                   {campaigns.filter(c => c.status === 'active').length}
                 </div>
               )}
             </div>
 
-            <div className="bg-gradient-to-r from-blue-700 to-blue-800 shadow rounded-lg p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
-              <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Total ROI Earned</h2>
+            <div className="bg-gradient-to-br from-purple-500 to-pink-600 shadow-xl rounded-2xl p-6 transform hover:scale-105 transition-all duration-300 sm:col-span-2 lg:col-span-1">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm sm:text-base font-semibold text-white/90">Total ROI Earned</h2>
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                  <span className="text-xl">📈</span>
+                </div>
+              </div>
               {loading ? (
-                <div className="text-white text-lg sm:text-2xl">Loading...</div>
+                <div className="text-white text-lg sm:text-2xl animate-pulse">Loading...</div>
               ) : (
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-white break-words">
+                <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">
                   {formatCurrency(campaigns.reduce((sum, c) => sum + c.total_roi_earned, 0))}
                 </div>
               )}
@@ -313,8 +328,8 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                       {transactions.slice(0, 5).map((transaction) => (
                         <div key={transaction.id} className="flex items-center justify-between py-3 border-b border-gray-700/50 last:border-b-0">
                           <div className="flex items-center">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                              transaction.amount > 0 ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-600/20 text-blue-300'
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 shadow-lg ${
+                              transaction.amount > 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
                             }`}>
                               {transaction.amount > 0 ? '+' : '-'}
                             </div>
@@ -323,7 +338,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                               <p className="text-sm text-gray-400">{new Date(transaction.created_at).toLocaleDateString()}</p>
                             </div>
                           </div>
-                          <div className={`font-semibold ${transaction.amount > 0 ? 'text-blue-400' : 'text-blue-300'}`}>
+                          <div className={`font-bold text-lg ${transaction.amount > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                             {formatCurrency(Math.abs(transaction.amount))}
                           </div>
                         </div>
@@ -347,9 +362,9 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                   <h2 className="text-lg font-medium text-white">My Campaigns</h2>
                   <button
                     onClick={() => setShowCreateCampaign(true)}
-                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
+                    className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
                   >
-                    Create Campaign
+                    ➕ Create Campaign
                   </button>
                 </div>
                 <div className="px-6 py-4">
@@ -363,13 +378,13 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                   ) : (
                     <div className="space-y-6">
                       {campaigns.map((campaign) => (
-                        <div key={campaign.id} className="border border-gray-700/50 rounded-2xl p-6 bg-gray-800/40">
+                        <div key={campaign.id} className="border border-gray-700/50 rounded-2xl p-6 bg-gradient-to-br from-gray-800/40 to-gray-900/40 hover:from-gray-800/60 hover:to-gray-900/60 transition-all duration-300 shadow-xl">
                           <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold text-white">{campaign.name}</h3>
-                            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              campaign.status === 'active' ? 'bg-blue-500/20 text-blue-300' :
-                              campaign.status === 'completed' ? 'bg-blue-600/20 text-blue-400' :
-                              'bg-gray-700 text-gray-300'
+                            <span className={`px-4 py-2 rounded-full text-xs font-semibold shadow-lg ${
+                              campaign.status === 'active' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' :
+                              campaign.status === 'completed' ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' :
+                              'bg-gray-700 text-gray-300 border border-gray-600'
                             }`}>
                               {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
                             </span>
@@ -394,7 +409,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                             </div>
                             <div>
                               <p className="text-sm text-gray-400">Total Earned</p>
-                              <p className="font-semibold text-blue-400">{formatCurrency(campaign.total_roi_earned)}</p>
+                              <p className="font-semibold text-emerald-400">{formatCurrency(campaign.total_roi_earned)}</p>
                             </div>
                             <div>
                               <p className="text-sm text-gray-400">CPC</p>
@@ -418,12 +433,12 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                             )}
                           </div>
 
-                          <div className="mt-4 flex items-center justify-end">
+                          <div className="mt-6 flex items-center justify-end">
                             <button
                               onClick={() => setShowLeadsFor(campaign)}
-                              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-xl text-sm font-medium"
+                              className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
                             >
-                              View Campaign Details
+                              📊 View Details
                             </button>
                           </div>
                         </div>
@@ -452,8 +467,8 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                       {transactions.map((transaction) => (
                         <div key={transaction.id} className="flex items-center justify-between py-4 border-b border-gray-700/50 last:border-b-0">
                           <div className="flex items-center">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
-                              transaction.amount > 0 ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-600/20 text-blue-300'
+                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mr-4 shadow-lg ${
+                              transaction.amount > 0 ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
                             }`}>
                               {transaction.transaction_type === 'deposit' && '↑'}
                               {transaction.transaction_type === 'withdrawal' && '↓'}
@@ -469,7 +484,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                               </p>
                             </div>
                           </div>
-                          <div className={`font-semibold ${transaction.amount > 0 ? 'text-blue-400' : 'text-blue-300'}`}>
+                          <div className={`font-bold text-lg ${transaction.amount > 0 ? 'text-emerald-400' : 'text-red-400'}`}>
                             {transaction.amount > 0 ? '+' : ''}{formatCurrency(transaction.amount)}
                           </div>
                         </div>
