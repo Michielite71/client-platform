@@ -84,6 +84,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
       const balance = data?.reduce((sum, transaction) => sum + transaction.amount, 0) || 0
       setCurrentBalance(balance)
     }
+    setLoading(false)
   }, [client, supabase])
 
   const fetchCampaigns = useCallback(async () => {
