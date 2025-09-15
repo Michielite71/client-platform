@@ -3,8 +3,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import LeadsModal from '@/components/LeadsModal'
-import CreateCampaignModal from '@/components/CreateCampaignModal'
 
 interface Client {
   id: string
@@ -51,8 +49,6 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [currentBalance, setCurrentBalance] = useState(0)
   const [activeTab, setActiveTab] = useState<'overview' | 'campaigns' | 'transactions'>('overview')
-  const [showLeadsFor, setShowLeadsFor] = useState<Campaign | null>(null)
-  const [showCreateCampaign, setShowCreateCampaign] = useState(false)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const supabase = createClient()
@@ -358,14 +354,8 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
 
             {activeTab === 'campaigns' && (
               <>
-                <div className="px-6 py-4 border-b border-gray-700/50 flex items-center justify-between">
+                <div className="px-6 py-4 border-b border-gray-700/50">
                   <h2 className="text-lg font-medium text-white">My Campaigns</h2>
-                  <button
-                    onClick={() => setShowCreateCampaign(true)}
-                    className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
-                  >
-                    ➕ Create Campaign
-                  </button>
                 </div>
                 <div className="px-6 py-4">
                   {loading ? (
@@ -433,14 +423,6 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                             )}
                           </div>
 
-                          <div className="mt-6 flex items-center justify-end">
-                            <button
-                              onClick={() => setShowLeadsFor(campaign)}
-                              className="bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
-                            >
-                              📊 View Details
-                            </button>
-                          </div>
                         </div>
                       ))}
                     </div>
@@ -497,25 +479,6 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
           </div>
         </div>
       </main>
-      {showCreateCampaign && client && (
-        // lazy import not necessary here
-        <CreateCampaignModal
-          client={client}
-          onClose={() => setShowCreateCampaign(false)}
-          onCampaignAdded={() => {
-            setShowCreateCampaign(false)
-            // refresh lists
-            fetchCampaigns()
-            fetchTransactions()
-          }}
-        />
-      )}
-      {showLeadsFor && (
-        <LeadsModal
-          campaign={showLeadsFor}
-          onClose={() => setShowLeadsFor(null)}
-        />
-      )}
     </div>
   )
 }
