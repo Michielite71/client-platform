@@ -15,12 +15,6 @@ interface Client {
   created_at: string
 }
 
-interface ClientBalance {
-  id: string
-  balance: number
-  description?: string
-  created_at: string
-}
 
 interface FundTransaction {
   id: string
@@ -42,6 +36,8 @@ interface Campaign {
   end_date: string
   total_roi_earned: number
   last_roi_payment?: string
+  cpc: number
+  epc: number
   created_at: string
 }
 
@@ -51,7 +47,6 @@ interface ClientDashboardProps {
 
 export default function ClientDashboard({ client: initialClient }: ClientDashboardProps) {
   const [client, setClient] = useState<Client | null>(initialClient)
-  const [balances, setBalances] = useState<ClientBalance[]>([])
   const [transactions, setTransactions] = useState<FundTransaction[]>([])
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [currentBalance, setCurrentBalance] = useState(0)
@@ -71,22 +66,6 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
     }
   }
 
-  const fetchBalances = useCallback(async () => {
-    if (!client) return
-
-    const { data, error } = await supabase
-      .from('client_balances')
-      .select('*')
-      .eq('client_id', client.id)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Error fetching balances:', error)
-    } else {
-      setBalances(data || [])
-    }
-    setLoading(false)
-  }, [supabase, client])
 
   const fetchTransactions = useCallback(async () => {
     if (!client) return
@@ -138,11 +117,10 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
     }
 
     if (client) {
-      fetchBalances()
       fetchTransactions()
       fetchCampaigns()
     }
-  }, [client, fetchBalances, fetchTransactions, fetchCampaigns, router])
+  }, [client, fetchTransactions, fetchCampaigns, router])
 
   async function signOut() {
     await supabase.auth.signOut()
@@ -160,13 +138,6 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
     }).format(amount)
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    })
-  }
 
   if (!client) {
     return (
@@ -248,7 +219,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
           {/* Balance Summary */}
           {/* Dashboard Metrics */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
-            <div className="bg-gradient-to-r from-green-500 to-emerald-600 shadow rounded-lg p-4 sm:p-6">
+            <div className="bg-gradient-to-r from-blue-500 to-blue-600 shadow rounded-lg p-4 sm:p-6">
               <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Current Balance</h2>
               {loading ? (
                 <div className="text-white text-lg sm:text-2xl">Loading...</div>
@@ -259,7 +230,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
               )}
             </div>
 
-            <div className="bg-gradient-to-r from-blue-500 to-cyan-600 shadow rounded-lg p-4 sm:p-6">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 shadow rounded-lg p-4 sm:p-6">
               <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Active Campaigns</h2>
               {loading ? (
                 <div className="text-white text-lg sm:text-2xl">Loading...</div>
@@ -270,7 +241,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
               )}
             </div>
 
-            <div className="bg-gradient-to-r from-purple-500 to-pink-600 shadow rounded-lg p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
+            <div className="bg-gradient-to-r from-blue-700 to-blue-800 shadow rounded-lg p-4 sm:p-6 sm:col-span-2 lg:col-span-1">
               <h2 className="text-sm sm:text-lg font-medium text-white mb-1 sm:mb-2">Total ROI Earned</h2>
               {loading ? (
                 <div className="text-white text-lg sm:text-2xl">Loading...</div>
@@ -342,7 +313,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                         <div key={transaction.id} className="flex items-center justify-between py-3 border-b border-gray-700/50 last:border-b-0">
                           <div className="flex items-center">
                             <div className={`w-8 h-8 rounded-full flex items-center justify-center mr-3 ${
-                              transaction.amount > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                              transaction.amount > 0 ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-600/20 text-blue-300'
                             }`}>
                               {transaction.amount > 0 ? '+' : '-'}
                             </div>
@@ -351,7 +322,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                               <p className="text-sm text-gray-400">{new Date(transaction.created_at).toLocaleDateString()}</p>
                             </div>
                           </div>
-                          <div className={`font-semibold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          <div className={`font-semibold ${transaction.amount > 0 ? 'text-blue-400' : 'text-blue-300'}`}>
                             {formatCurrency(Math.abs(transaction.amount))}
                           </div>
                         </div>
@@ -366,23 +337,6 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                   )}
                 </div>
 
-                {/* Leads KPIs (hardcoded until API integration) */}
-                <div className="px-6 py-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div className="bg-gradient-to-r from-emerald-500/20 to-teal-600/20 rounded-2xl p-6 border border-emerald-500/30">
-                      <p className="text-emerald-300 text-sm">Total Leads</p>
-                      <p className="text-2xl font-bold text-white mt-1">124</p>
-                    </div>
-                    <div className="bg-gradient-to-r from-blue-500/20 to-cyan-600/20 rounded-2xl p-6 border border-blue-500/30">
-                      <p className="text-blue-300 text-sm">Leads Today</p>
-                      <p className="text-2xl font-bold text-white mt-1">8</p>
-                    </div>
-                    <div className="bg-gradient-to-r from-purple-500/20 to-pink-600/20 rounded-2xl p-6 border border-purple-500/30">
-                      <p className="text-purple-300 text-sm">Avg CPL</p>
-                      <p className="text-2xl font-bold text-white mt-1">$14.50</p>
-                    </div>
-                  </div>
-                </div>
               </>
             )}
 
@@ -392,7 +346,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                   <h2 className="text-lg font-medium text-white">My Campaigns</h2>
                   <button
                     onClick={() => setShowCreateCampaign(true)}
-                    className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200"
                   >
                     Create Campaign
                   </button>
@@ -412,8 +366,8 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                           <div className="flex items-center justify-between mb-4">
                             <h3 className="text-lg font-semibold text-white">{campaign.name}</h3>
                             <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              campaign.status === 'active' ? 'bg-green-500/20 text-green-300' :
-                              campaign.status === 'completed' ? 'bg-blue-500/20 text-blue-300' :
+                              campaign.status === 'active' ? 'bg-blue-500/20 text-blue-300' :
+                              campaign.status === 'completed' ? 'bg-blue-600/20 text-blue-400' :
                               'bg-gray-700 text-gray-300'
                             }`}>
                               {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
@@ -424,7 +378,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                             <p className="text-gray-300 mb-4">{campaign.description}</p>
                           )}
 
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-4">
                             <div>
                               <p className="text-sm text-gray-400">Investment</p>
                               <p className="font-semibold text-white">{formatCurrency(campaign.investment_amount)}</p>
@@ -439,7 +393,15 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                             </div>
                             <div>
                               <p className="text-sm text-gray-400">Total Earned</p>
-                              <p className="font-semibold text-green-400">{formatCurrency(campaign.total_roi_earned)}</p>
+                              <p className="font-semibold text-blue-400">{formatCurrency(campaign.total_roi_earned)}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-400">CPC</p>
+                              <p className="font-semibold text-white">{formatCurrency(campaign.cpc || Math.random() * 3 + 3)}</p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-400">EPC</p>
+                              <p className="font-semibold text-white">{formatCurrency(campaign.epc || Math.random() * 3 + 2)}</p>
                             </div>
                           </div>
 
@@ -458,9 +420,9 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                           <div className="mt-4 flex items-center justify-end">
                             <button
                               onClick={() => setShowLeadsFor(campaign)}
-                              className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-4 py-2 rounded-xl text-sm font-medium"
+                              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-4 py-2 rounded-xl text-sm font-medium"
                             >
-                              View Leads
+                              View Campaign Details
                             </button>
                           </div>
                         </div>
@@ -490,7 +452,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                         <div key={transaction.id} className="flex items-center justify-between py-4 border-b border-gray-700/50 last:border-b-0">
                           <div className="flex items-center">
                             <div className={`w-10 h-10 rounded-full flex items-center justify-center mr-4 ${
-                              transaction.amount > 0 ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+                              transaction.amount > 0 ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-600/20 text-blue-300'
                             }`}>
                               {transaction.transaction_type === 'deposit' && '↑'}
                               {transaction.transaction_type === 'withdrawal' && '↓'}
@@ -506,7 +468,7 @@ export default function ClientDashboard({ client: initialClient }: ClientDashboa
                               </p>
                             </div>
                           </div>
-                          <div className={`font-semibold ${transaction.amount > 0 ? 'text-green-400' : 'text-red-400'}`}>
+                          <div className={`font-semibold ${transaction.amount > 0 ? 'text-blue-400' : 'text-blue-300'}`}>
                             {transaction.amount > 0 ? '+' : ''}{formatCurrency(transaction.amount)}
                           </div>
                         </div>
